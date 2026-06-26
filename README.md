@@ -2,7 +2,7 @@
 
 [![attach-review-proof installs](https://shieldcn.dev/skills/installs/mezotv/proofdrop/attach-review-proof.svg?label=attach-review-proof)](https://www.skills.sh/mezotv/proofdrop/attach-review-proof)
 
-Small HTTP MCP server that lets agents drop temporary public review proofs into [Neon Storage](https://neon.com/docs/storage/overview) and get a URL back.
+Small HTTP MCP server that lets agents drop temporary public review proofs into configurable [files-sdk](https://files-sdk.dev/) storage and get a URL back.
 
 The intended use case is screenshots and other review artifacts for GitHub PR descriptions, issue comments, and agent reports. Agents can upload the asset and embed the returned URL instead of creating throwaway branches, pushing binary files to unrelated repos, or abusing a burner repository.
 
@@ -18,24 +18,23 @@ Do NOT upload internal documents, customer data, secrets, private product screen
 
 ## Tools
 
-- `upload_asset`: uploads a local file to Neon storage and returns a presigned GET URL.
-- `delete_asset`: deletes an uploaded object by the returned S3 key.
+- `upload_asset`: uploads a local file to the configured files-sdk storage adapter and returns a URL.
+- `delete_asset`: deletes an uploaded object by the returned storage key.
 
-Uploaded objects may be private at the bucket layer, but the returned URL is a public access capability for anyone who has it. The returned URL is temporary and expires according to `ASSET_URL_TTL_SECONDS` or the tool input.
+Uploaded objects may be private at the storage layer, but the returned URL is a public access capability for anyone who has it. For signing adapters, the returned URL expires according to `ASSET_URL_TTL_SECONDS` or the tool input. For public/CDN/static adapters, the URL may not expire.
 
-## Neon Storage
+## Storage
 
-Proofdrop uses Neon's S3-compatible object storage API, so it works with standard AWS S3 SDK clients while keeping review artifacts in a Neon-backed bucket.
+Proofdrop uses [haydenbleasel/files-sdk](https://files-sdk.dev/) so review artifacts are not tied to Neon. The default adapter is generic S3-compatible storage, which works with AWS S3, Neon object storage, Cloudflare R2 S3-compatible HTTP credentials, MinIO, Tigris, and similar services.
 
-Useful Neon docs:
+Set `FILES_ADAPTER=s3` for S3-compatible storage, or `FILES_ADAPTER=fs` for local dev/CI storage.
 
-- [Neon Storage overview](https://neon.com/docs/storage/overview)
-- [Neon Storage quickstart](https://neon.com/docs/storage/get-started)
-- [Buckets](https://neon.com/docs/storage/buckets)
-- [Objects and presigned URLs](https://neon.com/docs/storage/objects)
-- [Authentication](https://neon.com/docs/storage/authentication)
+Useful files-sdk docs:
 
-Neon Storage is currently in private preview for new projects in the AWS `us-east-2` region. See the Neon docs for current availability before provisioning a new deployment.
+- [Overview](https://files-sdk.dev/)
+- [S3 adapter](https://files-sdk.dev/adapters/s3)
+- [Filesystem adapter](https://files-sdk.dev/adapters/fs)
+- [URL API](https://files-sdk.dev/api/url)
 
 ## Setup
 
@@ -80,18 +79,33 @@ pnpm run dev
 
 ## Configuration
 
-- `AWS_ENDPOINT_URL_S3`: Neon S3 endpoint URL.
-- `AWS_ACCESS_KEY_ID`: Neon storage access key ID.
-- `AWS_SECRET_ACCESS_KEY`: Neon storage secret access key.
-- `AWS_REGION`: Neon storage region.
-- `AWS_S3_BUCKET_NAME`: target bucket name.
+- `FILES_ADAPTER`: storage adapter, either `s3` or `fs`. Defaults to `s3`.
 - `MCP_PORT`: optional HTTP port, defaults to `3000`.
 - `PROOFDROP_API_KEY`: optional API key for hosted deployments. When set, `/mcp` requires `Authorization: Bearer <value>` or `X-API-Key: <value>`.
 - `ASSET_KEY_PREFIX`: optional key prefix, defaults to `proofdrop`.
 - `ASSET_URL_TTL_SECONDS`: optional default URL lifetime, defaults to `86400`.
 - `MAX_ASSET_BYTES`: optional maximum local file size, defaults to `26214400`.
 
-`S3_BUCKET_NAME` and `AWS_BUCKET_NAME` are accepted as bucket-name fallbacks, but `AWS_S3_BUCKET_NAME` is the preferred env var.
+### S3-compatible storage
+
+- `FILES_BUCKET`: target bucket name.
+- `FILES_S3_ENDPOINT`: optional S3-compatible endpoint URL. Falls back to `AWS_ENDPOINT_URL_S3`.
+- `FILES_S3_REGION`: optional signing region. Falls back to `AWS_REGION`, then `AWS_DEFAULT_REGION`, then `auto`.
+- `FILES_S3_ACCESS_KEY_ID`: optional static access key ID. Falls back to `AWS_ACCESS_KEY_ID`.
+- `FILES_S3_SECRET_ACCESS_KEY`: optional static secret access key. Falls back to `AWS_SECRET_ACCESS_KEY`.
+- `FILES_S3_SESSION_TOKEN`: optional static session token. Falls back to `AWS_SESSION_TOKEN`.
+- `FILES_S3_FORCE_PATH_STYLE`: optional boolean, defaults to `true` for S3-compatible providers.
+- `FILES_PUBLIC_BASE_URL`: optional public/CDN/custom-domain base URL. When set, `upload_asset` returns `${FILES_PUBLIC_BASE_URL}/${key}` instead of a signed URL.
+
+`FILES_S3_BUCKET`, `AWS_S3_BUCKET_NAME`, `S3_BUCKET_NAME`, and `AWS_BUCKET_NAME` are accepted as bucket-name fallbacks.
+
+### Local filesystem storage
+
+- `FILES_ADAPTER=fs`: use files-sdk's local filesystem adapter.
+- `FILES_FS_ROOT`: optional storage root, defaults to `.proofdrop-assets`.
+- `FILES_PUBLIC_BASE_URL`: optional HTTP base URL if another server exposes `FILES_FS_ROOT`.
+
+Without `FILES_PUBLIC_BASE_URL`, the filesystem adapter returns `file://` URLs, which are useful for local tests but not for browser-visible PR comments.
 
 ## Upload Example
 
@@ -110,6 +124,8 @@ The response includes:
 ```json
 {
   "bucket": "example-bucket",
+  "storageProvider": "s3",
+  "storageLocation": "example-bucket",
   "key": "proofdrop/2026-06-26/uuid-screenshot.png",
   "url": "https://...",
   "expiresAt": "2026-06-27T08:00:00.000Z",
@@ -122,4 +138,4 @@ Use `url` in the PR description or comment. Keep `key` if you want to call `dele
 
 ## Temporary Object Cleanup
 
-Presigned URLs expire automatically, but the underlying object remains in the bucket until deleted or expired by a bucket lifecycle rule. Configure a Neon/S3 lifecycle policy for the `ASSET_KEY_PREFIX` prefix if you want automatic cleanup.
+Signed URLs expire automatically, but the underlying object remains in storage until deleted or expired by a provider lifecycle rule. Configure cleanup for the `ASSET_KEY_PREFIX` prefix in your storage provider if you want automatic retention.
