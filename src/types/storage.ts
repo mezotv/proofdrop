@@ -6,5 +6,6 @@ export type AssetStorage = {
   files: Files<Adapter>;
   provider: AssetStorageProvider;
   location: string;
+  urlExpires: boolean;
   bucket?: string;
 };

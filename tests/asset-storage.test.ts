@@ -34,9 +34,10 @@ describe("asset storage", () => {
     assert.equal(uploaded.storageLocation, process.env.FILES_FS_ROOT);
     assert.match(uploaded.key, /^tests\/\d{4}-\d{2}-\d{2}\/.+-review-proof\.txt$/);
     assert.equal(uploaded.url.startsWith("file://"), true);
+    assert.equal(uploaded.urlExpires, false);
+    assert.equal(uploaded.expiresAt, undefined);
     assert.equal(uploaded.contentType, "text/plain");
     assert.equal(uploaded.sizeBytes, Buffer.byteLength("proofdrop test asset\n"));
-    assert.ok(Date.parse(uploaded.expiresAt) > Date.now());
 
     const storedPath = join(process.env.FILES_FS_ROOT!, uploaded.key);
     assert.equal(await readFile(storedPath, "utf8"), "proofdrop test asset\n");

@@ -19,7 +19,8 @@ export type UploadedAsset = {
   storageLocation: string;
   key: string;
   url: string;
-  expiresAt: string;
+  urlExpires: boolean;
+  expiresAt?: string;
   contentType: string;
   sizeBytes: number;
 };

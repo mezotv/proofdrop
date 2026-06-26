@@ -12,6 +12,7 @@ describe("files-sdk filesystem storage factory", () => {
 
     assert.equal(storage.provider, "fs");
     assert.equal(storage.location, "/tmp/proofdrop-fs-test");
+    assert.equal(storage.urlExpires, false);
     assert.equal(storage.bucket, undefined);
     assert.strictEqual(assetStorage(), storage);
   });

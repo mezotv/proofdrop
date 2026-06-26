@@ -43,6 +43,8 @@ pnpm install
 pnpm run build
 ```
 
+Requires Node.js 22.12.0 or newer.
+
 Start the HTTP server:
 
 ```bash
@@ -128,11 +130,14 @@ The response includes:
   "storageLocation": "example-bucket",
   "key": "proofdrop/2026-06-26/uuid-screenshot.png",
   "url": "https://...",
+  "urlExpires": true,
   "expiresAt": "2026-06-27T08:00:00.000Z",
   "contentType": "image/png",
   "sizeBytes": 12345
 }
 ```
+
+`expiresAt` is included only when the returned URL is signed and actually expires. Public/CDN/static URLs include `"urlExpires": false` and do not include `expiresAt`.
 
 Use `url` in the PR description or comment. Keep `key` if you want to call `delete_asset` later.
 

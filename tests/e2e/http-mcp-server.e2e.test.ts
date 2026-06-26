@@ -68,6 +68,8 @@ describe("HTTP MCP server e2e", () => {
     assert.equal(uploaded.storageLocation, process.env.FILES_FS_ROOT);
     assert.match(uploaded.key, /^e2e\/\d{4}-\d{2}-\d{2}\/.+-proof\.txt$/);
     assert.equal(uploaded.url.startsWith("file://"), true);
+    assert.equal(uploaded.urlExpires, false);
+    assert.equal(uploaded.expiresAt, undefined);
     assert.equal(uploaded.contentType, "text/plain");
     assert.equal(uploaded.sizeBytes, Buffer.byteLength("proofdrop e2e asset\n"));
 

@@ -18,6 +18,7 @@ describe("files-sdk S3-compatible storage factory", () => {
 
     assert.equal(storage.provider, "s3");
     assert.equal(storage.location, "explicit-bucket");
+    assert.equal(storage.urlExpires, false);
     assert.equal(storage.bucket, "explicit-bucket");
   });
 });

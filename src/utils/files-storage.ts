@@ -31,6 +31,7 @@ function createAssetStorage(): AssetStorage {
       }),
       provider,
       location: root,
+      urlExpires: false,
     };
   }
 
@@ -50,6 +51,7 @@ function createAssetStorage(): AssetStorage {
     }),
     provider,
     location: bucket,
+    urlExpires: !publicBaseUrl,
     bucket,
   };
 }

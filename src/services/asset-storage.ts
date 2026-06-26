@@ -25,7 +25,7 @@ export async function uploadAsset(input: UploadAssetInput): Promise<UploadedAsse
   const ttl = clampTtl(input.expires_in_seconds);
   await storage.files.upload(key, body, { contentType });
 
-  const expiresAt = new Date(Date.now() + ttl * 1000).toISOString();
+  const expiresAt = storage.urlExpires ? new Date(Date.now() + ttl * 1000).toISOString() : undefined;
   const url = await storage.files.url(key, { expiresIn: ttl });
 
   return {
@@ -34,6 +34,7 @@ export async function uploadAsset(input: UploadAssetInput): Promise<UploadedAsse
     storageLocation: storage.location,
     key,
     url,
+    urlExpires: storage.urlExpires,
     expiresAt,
     contentType,
     sizeBytes: fileStat.size,
