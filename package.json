@@ -1,0 +1,30 @@
+{
+  "name": "cdn-mcp",
+  "version": "0.1.0",
+  "description": "Small MCP server for temporary agent asset uploads to S3-compatible storage.",
+  "type": "module",
+  "bin": {
+    "cdn-mcp": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "latest",
+    "@aws-sdk/s3-request-presigner": "latest",
+    "@modelcontextprotocol/sdk": "latest",
+    "dotenv": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
