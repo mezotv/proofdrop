@@ -1,40 +1,65 @@
-# CDN MCP
+# Proofdrop MCP
 
-Small stdio MCP server that lets agents upload temporary assets to Neon S3-compatible storage and get a URL back.
+Small HTTP MCP server that lets agents drop temporary public review proofs into Neon storage and get a URL back.
 
 The intended use case is screenshots and other review artifacts for GitHub PR descriptions, issue comments, and agent reports. Agents can upload the asset and embed the returned URL instead of creating throwaway branches, pushing binary files to unrelated repos, or abusing a burner repository.
 
+## DISCLAIMER
+
+This service is for PUBLIC, SHORT-LIVED REVIEW ASSETS ONLY.
+
+Use it for GitHub PR screenshots, issue comments, agent reports, and other short-lived review artifacts that need image, screen recording, or screenshot URLs.
+
+Do NOT upload internal documents, customer data, secrets, private product screenshots, credentials, unreleased confidential material, or anything that should stay private. Treat every returned URL as public to anyone who has it.
+
+`PROOFDROP_API_KEY` can restrict who is allowed to call the hosted MCP endpoint, but it does not make uploaded images private. The uploaded asset URL is still shareable/public for as long as the URL works.
+
 ## Tools
 
-- `upload_asset`: uploads a local file to S3-compatible storage and returns a presigned GET URL.
+- `upload_asset`: uploads a local file to Neon storage and returns a presigned GET URL.
 - `delete_asset`: deletes an uploaded object by the returned S3 key.
 
-Uploaded objects are private by default. The returned URL is temporary and expires according to `ASSET_URL_TTL_SECONDS` or the tool input.
+Uploaded objects may be private at the bucket layer, but the returned URL is a public access capability for anyone who has it. The returned URL is temporary and expires according to `ASSET_URL_TTL_SECONDS` or the tool input.
 
 ## Setup
 
 ```bash
-npm install
-npm run build
+pnpm install
+pnpm run build
 ```
 
-Add the built server to an MCP client:
+Start the HTTP server:
 
-```json
-{
-  "mcpServers": {
-    "cdn-mcp": {
-      "command": "node",
-      "args": ["/absolute/path/to/cdn-mcp/dist/index.js"]
-    }
-  }
-}
+```bash
+pnpm run start
 ```
+
+By default it listens on:
+
+```text
+http://localhost:3000/mcp
+```
+
+Set `MCP_PORT` to change the port.
+
+Add the HTTP server to Codex:
+
+```bash
+npx add-mcp http://localhost:3000/mcp --name proofdrop-mcp --agent codex --global
+```
+
+For an API-key protected deployment:
+
+```bash
+npx add-mcp https://your-host.example/mcp --name proofdrop-mcp --agent codex --global --header 'Authorization: Bearer ${PROOFDROP_API_KEY}'
+```
+
+Codex does not start HTTP MCP servers for you. Keep `pnpm run start` or your hosted deployment running while Codex uses this MCP endpoint.
 
 For local development:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ## Configuration
@@ -44,6 +69,8 @@ npm run dev
 - `AWS_SECRET_ACCESS_KEY`: Neon storage secret access key.
 - `AWS_REGION`: Neon storage region.
 - `AWS_S3_BUCKET_NAME`: target bucket name.
+- `MCP_PORT`: optional HTTP port, defaults to `3000`.
+- `PROOFDROP_API_KEY`: optional API key for hosted deployments. When set, `/mcp` requires `Authorization: Bearer <value>` or `X-API-Key: <value>`.
 - `ASSET_KEY_PREFIX`: optional key prefix, defaults to `agent-assets`.
 - `ASSET_URL_TTL_SECONDS`: optional default URL lifetime, defaults to `86400`.
 - `MAX_ASSET_BYTES`: optional maximum local file size, defaults to `26214400`.

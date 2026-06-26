@@ -1,17 +1,38 @@
 #!/usr/bin/env node
 
 import "dotenv/config";
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { SERVER_NAME, SERVER_VERSION } from "./constants/server.js";
-import { registerAssetTools } from "./tools/asset-tools.js";
+import { startHttpMcpServer } from "./server/http-mcp-server.js";
 
-const server = new McpServer({
-  name: SERVER_NAME,
-  version: SERVER_VERSION,
+const server = await startHttpMcpServer();
+
+async function shutdown(signal: NodeJS.Signals): Promise<void> {
+  console.error(`Received ${signal}, shutting down proofdrop-mcp`);
+  await new Promise<void>((resolve, reject) => {
+    server.close((error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+
+      resolve();
+    });
+  });
+}
+
+process.once("SIGINT", (signal) => {
+  void shutdown(signal)
+    .then(() => process.exit(0))
+    .catch((error: unknown) => {
+      console.error("Failed to shut down proofdrop-mcp:", error);
+      process.exit(1);
+    });
 });
 
-registerAssetTools(server);
-
-const transport = new StdioServerTransport();
-await server.connect(transport);
+process.once("SIGTERM", (signal) => {
+  void shutdown(signal)
+    .then(() => process.exit(0))
+    .catch((error: unknown) => {
+      console.error("Failed to shut down proofdrop-mcp:", error);
+      process.exit(1);
+    });
+});

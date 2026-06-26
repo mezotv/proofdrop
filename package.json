@@ -1,10 +1,10 @@
 {
-  "name": "cdn-mcp",
+  "name": "proofdrop-mcp",
   "version": "0.1.0",
-  "description": "Small MCP server for temporary agent asset uploads to S3-compatible storage.",
+  "description": "HTTP MCP server for temporary public review proof uploads to S3-compatible storage.",
   "type": "module",
   "bin": {
-    "cdn-mcp": "./dist/index.js"
+    "proofdrop-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
