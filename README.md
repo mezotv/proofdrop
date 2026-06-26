@@ -1,5 +1,7 @@
 # Proofdrop MCP
 
+[![attach-review-proof installs](https://shieldcn.dev/skills/installs/mezotv/proofdrop/attach-review-proof.svg?label=attach-review-proof)](https://www.skills.sh/mezotv/proofdrop/attach-review-proof)
+
 Small HTTP MCP server that lets agents drop temporary public review proofs into Neon storage and get a URL back.
 
 The intended use case is screenshots and other review artifacts for GitHub PR descriptions, issue comments, and agent reports. Agents can upload the asset and embed the returned URL instead of creating throwaway branches, pushing binary files to unrelated repos, or abusing a burner repository.
