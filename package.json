@@ -1,22 +1,27 @@
 {
   "name": "proofdrop-mcp",
   "version": "0.1.0",
-  "description": "HTTP MCP server for temporary public review proof uploads to S3-compatible storage.",
+  "description": "HTTP MCP server for temporary public review proof uploads to configurable files-sdk storage.",
   "type": "module",
   "bin": {
     "proofdrop-mcp": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",
+    "coverage": "node --import tsx --test --experimental-test-coverage tests/*.test.ts tests/e2e/*.test.ts",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
+    "test": "node --import tsx --test tests/*.test.ts tests/e2e/*.test.ts",
+    "test:e2e": "node --import tsx --test tests/e2e/*.test.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "latest",
+    "@aws-sdk/s3-presigned-post": "^3.1075.0",
     "@aws-sdk/s3-request-presigner": "latest",
     "@modelcontextprotocol/sdk": "latest",
     "dotenv": "latest",
+    "files-sdk": "^2.0.0",
     "zod": "latest"
   },
   "devDependencies": {
@@ -25,6 +30,6 @@
     "typescript": "latest"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=22.12.0"
   }
 }

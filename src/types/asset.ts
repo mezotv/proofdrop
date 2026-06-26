@@ -4,7 +4,9 @@ import type { deleteAssetInputObjectSchema, uploadAssetInputObjectSchema } from 
 export type DeleteAssetInput = z.infer<typeof deleteAssetInputObjectSchema>;
 
 export type DeletedAsset = {
-  bucket: string;
+  bucket?: string;
+  storageProvider: string;
+  storageLocation: string;
   key: string;
   deleted: true;
 };
@@ -12,10 +14,13 @@ export type DeletedAsset = {
 export type UploadAssetInput = z.infer<typeof uploadAssetInputObjectSchema>;
 
 export type UploadedAsset = {
-  bucket: string;
+  bucket?: string;
+  storageProvider: string;
+  storageLocation: string;
   key: string;
   url: string;
-  expiresAt: string;
+  urlExpires: boolean;
+  expiresAt?: string;
   contentType: string;
   sizeBytes: number;
 };
