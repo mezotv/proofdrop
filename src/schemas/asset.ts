@@ -4,7 +4,7 @@ import { MAX_URL_TTL_SECONDS } from "../constants/asset.js";
 export const uploadAssetInputShape = {
   file_path: z.string().min(1).describe("Absolute or working-directory-relative path to the local file to upload."),
   content_type: z.string().min(1).optional().describe("Optional MIME type override. Inferred from the file extension by default."),
-  key_prefix: z.string().min(1).optional().describe("Optional S3 key prefix. Defaults to ASSET_KEY_PREFIX or 'agent-assets'."),
+  key_prefix: z.string().min(1).optional().describe("Optional S3 key prefix. Defaults to ASSET_KEY_PREFIX or 'proofdrop'."),
   expires_in_seconds: z
     .number()
     .int()
