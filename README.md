@@ -2,7 +2,7 @@
 
 [![attach-review-proof installs](https://shieldcn.dev/skills/installs/mezotv/proofdrop/attach-review-proof.svg?label=attach-review-proof)](https://www.skills.sh/mezotv/proofdrop/attach-review-proof)
 
-Small HTTP MCP server that lets agents drop temporary public review proofs into Neon storage and get a URL back.
+Small HTTP MCP server that lets agents drop temporary public review proofs into [Neon Storage](https://neon.com/docs/storage/overview) and get a URL back.
 
 The intended use case is screenshots and other review artifacts for GitHub PR descriptions, issue comments, and agent reports. Agents can upload the asset and embed the returned URL instead of creating throwaway branches, pushing binary files to unrelated repos, or abusing a burner repository.
 
@@ -22,6 +22,20 @@ Do NOT upload internal documents, customer data, secrets, private product screen
 - `delete_asset`: deletes an uploaded object by the returned S3 key.
 
 Uploaded objects may be private at the bucket layer, but the returned URL is a public access capability for anyone who has it. The returned URL is temporary and expires according to `ASSET_URL_TTL_SECONDS` or the tool input.
+
+## Neon Storage
+
+Proofdrop uses Neon's S3-compatible object storage API, so it works with standard AWS S3 SDK clients while keeping review artifacts in a Neon-backed bucket.
+
+Useful Neon docs:
+
+- [Neon Storage overview](https://neon.com/docs/storage/overview)
+- [Neon Storage quickstart](https://neon.com/docs/storage/get-started)
+- [Buckets](https://neon.com/docs/storage/buckets)
+- [Objects and presigned URLs](https://neon.com/docs/storage/objects)
+- [Authentication](https://neon.com/docs/storage/authentication)
+
+Neon Storage is currently in private preview for new projects in the AWS `us-east-2` region. See the Neon docs for current availability before provisioning a new deployment.
 
 ## Setup
 
