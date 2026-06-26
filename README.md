@@ -71,7 +71,7 @@ pnpm run dev
 - `AWS_S3_BUCKET_NAME`: target bucket name.
 - `MCP_PORT`: optional HTTP port, defaults to `3000`.
 - `PROOFDROP_API_KEY`: optional API key for hosted deployments. When set, `/mcp` requires `Authorization: Bearer <value>` or `X-API-Key: <value>`.
-- `ASSET_KEY_PREFIX`: optional key prefix, defaults to `agent-assets`.
+- `ASSET_KEY_PREFIX`: optional key prefix, defaults to `proofdrop`.
 - `ASSET_URL_TTL_SECONDS`: optional default URL lifetime, defaults to `86400`.
 - `MAX_ASSET_BYTES`: optional maximum local file size, defaults to `26214400`.
 
@@ -94,7 +94,7 @@ The response includes:
 ```json
 {
   "bucket": "example-bucket",
-  "key": "agent-assets/2026-06-26/uuid-screenshot.png",
+  "key": "proofdrop/2026-06-26/uuid-screenshot.png",
   "url": "https://...",
   "expiresAt": "2026-06-27T08:00:00.000Z",
   "contentType": "image/png",
